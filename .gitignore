@@ -1,0 +1,12 @@
+__pycache__/
+*.so
+bin/
+venv/
+.idea/
+.git/
+lib/
+*.user
+[Bb]uild*
+[Bb]in
+*.log
+*.jpg

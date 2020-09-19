@@ -1,0 +1,253 @@
+codewars:
+  url: https://www.codewars.com
+user:
+  kata:
+    authored: []
+    completed:
+    - ext: py
+      href: 540d0fdd3b6532e5c3000b5b
+      level: 3
+      solution: binomial_expansion
+      text: Binomial Expansion
+    - ext: py
+      href: 53fe3578d5679bf04900093f
+      level: 5
+      solution: rotate_a_square_matrix_in_place
+      text: Rotate a square matrix in place
+    - ext: py
+      href: 56e3cbb5a28956899400073f
+      level: 5
+      solution: maximum_subarray_sum_ii
+      text: Maximum Subarray Sum II
+    - ext: py
+      href: 55b350026cc02ac1a7000032
+      level: 6
+      solution: convert_integer_to_whitespace_format
+      text: Convert integer to Whitespace format
+    - ext: py
+      href: 52742f58faf5485cae000b9a
+      level: 4
+      solution: human_readable_duration_format
+      text: Human readable duration format
+    - ext: py
+      href: 5254ca2719453dcc0b00027d
+      level: 4
+      solution: permutations
+      text: Permutations
+    - ext: py
+      href: 566efcfbf521a3cfd2000056
+      level: 7
+      solution: reversing_fun
+      text: Reversing Fun
+    - ext: py
+      href: 514a024011ea4fb54200004b
+      level: 5
+      solution: extract_the_domain_name_from_a_url
+      text: Extract the domain name from a URL
+    - ext: py
+      href: 52a382ee44408cea2500074c
+      level: 4
+      solution: matrix_determinant
+      text: Matrix Determinant
+    - ext: py
+      href: 51fda2d95d6efda45e00004e
+      level: 4
+      solution: codewars_style_ranking_system
+      text: Codewars style ranking system
+    - ext: py
+      href: 5c2cea87b0aea22f8181757c
+      level: 5
+      solution: regex_like_a_boss__4_codegolf___prime_length
+      text: RegEx Like a Boss  4 CodeGolf   Prime length
+    - ext: py
+      href: 54746b7ab2bc2868a0000acf
+      level: 5
+      solution: mod4_regex
+      text: Mod4 Regex
+    - ext: py
+      href: 548db0bd1df5bbf29b0000b7
+      level: 5
+      solution: validdate_regex
+      text: validDate Regex
+    - ext: py
+      href: 526989a41034285187000de4
+      level: 5
+      solution: count_ip_addresses
+      text: Count IP Addresses
+    - ext: py
+      href: 5aba780a6a176b029800041c
+      level: 7
+      solution: maximum_multiple
+      text: Maximum Multiple
+    - ext: py
+      href: 55f9bca8ecaa9eac7100004a
+      level: 8
+      solution: beginner_series__2_clock
+      text: Beginner Series  2 Clock
+    - ext: py
+      href: 5ab23a9c1cec39668c000055
+      level: 5
+      solution: regex_for_gregorian_date_validation
+      text: Regex for Gregorian date validation
+    - ext: py
+      href: 52e1476c8147a7547a000811
+      level: 5
+      solution: regex_password_validation
+      text: Regex Password Validation
+    - ext: py
+      href: 51c8e37cee245da6b40000bd
+      level: 4
+      solution: strip_comments
+      text: Strip Comments
+    - ext: py
+      href: 55695bc4f75bbaea5100016b
+      level: 5
+      solution: fibonacci_streaming
+      text: Fibonacci Streaming
+    - ext: py
+      href: 529adbf7533b761c560004e5
+      level: 5
+      solution: memoized_fibonacci
+      text: Memoized Fibonacci
+    - ext: py
+      href: 5264d2b162488dc400000001
+      level: 6
+      solution: stop_gninnips_my_sdrow_
+      text: 'Stop gninnipS My sdroW '
+    - ext: py
+      href: 526dad7f8c0eb5c4640000a4
+      level: 5
+      solution: vector_class
+      text: Vector class
+    - ext: py
+      href: 5e41c408b72541002eda0982
+      level: 5
+      solution: multi_line_task__hello_world__easy_one_
+      text: 'Multi Line Task  Hello World  Easy one '
+    - ext: py
+      href: 54d512e62a5e54c96200019e
+      level: 5
+      solution: primes_in_numbers
+      text: Primes in numbers
+    - ext: py
+      href: 520b9d2ad5c005041100000f
+      level: 5
+      solution: simple_pig_latin
+      text: Simple Pig Latin
+    - ext: py
+      href: 5726f813c8dcebf5ed000a6b
+      level: 5
+      solution: k_primes
+      text: k Primes
+    - ext: py
+      href: 5995ff073acba5fa3a00011d
+      level: 6
+      solution: ulam_sequences
+      text: Ulam Sequences
+    - ext: py
+      href: 514b92a657cdc65150000006
+      level: 6
+      solution: multiples_of_3_or_5
+      text: Multiples of 3 or 5
+    - ext: py
+      href: 55b080eabb080cd6f8000035
+      level: 6
+      solution: what_will_be_the_odd_one_out_
+      text: 'What will be the odd one out '
+    - ext: py
+      href: 54521e9ec8e60bc4de000d6c
+      level: 5
+      solution: maximum_subarray_sum
+      text: Maximum subarray sum
+    - ext: py
+      href: 5966ec8e62d030d8530000a7
+      level: 6
+      solution: super_coordinate_sums_
+      text: 'Super Coordinate Sums '
+    - ext: py
+      href: 556e0fccc392c527f20000c5
+      level: 6
+      solution: fibonacci__tribonacci_and_friends
+      text: Fibonacci  Tribonacci and friends
+    - ext: py
+      href: 58184387d14fc32f2b0012b2
+      level: 6
+      solution: floating_point_approximation__i_
+      text: 'Floating point Approximation  I '
+    - ext: py
+      href: 556deca17c58da83c00002db
+      level: 6
+      solution: tribonacci_sequence
+      text: Tribonacci Sequence
+    - ext: py
+      href: 55cbc3586671f6aa070000fb
+      level: 8
+      solution: grasshopper___check_for_factor
+      text: Grasshopper   Check for factor
+    - ext: py
+      href: 55f73be6e12baaa5900000d4
+      level: 8
+      solution: grasshopper___messi_goals_function
+      text: Grasshopper   Messi goals function
+    - ext: py
+      href: 50654ddff44f800200000004
+      level: 8
+      solution: multiply
+      text: Multiply
+    unfinished:
+    - ext: py
+      href: 532a69ee484b0e27120000b6
+      level: 5
+      solution: vector_class
+      text: Vector Class
+    - ext: py
+      href: 535bfa2ccdbf509be8000113
+      level: 5
+      solution: first_n_prime_numbers
+      text: First n Prime Numbers
+    - ext: py
+      href: 58603c898989d15e9e000475
+      level: 5
+      solution: master_your_primes__sieve_with_memoization
+      text: Master your primes  sieve with memoization
+    - ext: py
+      href: 58112f8004adbbdb500004fe
+      level: 6
+      solution: sql_basics__simple_union_all
+      text: SQL Basics  Simple UNION ALL
+    - ext: py
+      href: 5886e082a836a691340000c3
+      level: 4
+      solution: simple_fun__27__rectangle_rotation
+      text: Simple Fun  27  Rectangle Rotation
+    - ext: py
+      href: 5ae64f28d2ee274164000118
+      level: 4
+      solution: string____x_iterations____string
+      text: String    X Iterations    String
+    - ext: py
+      href: 5ae43ed6252e666a6b0000a4
+      level: 5
+      solution: string____n_iterations____string
+      text: String    N iterations    String
+    - ext: py
+      href: 5263c6999e0f40dee200059d
+      level: 4
+      solution: the_observed_pin
+      text: The observed PIN
+    - ext: py
+      href: 55c4eb777e07c13528000021
+      level: 4
+      solution: factorial_tail
+      text: Factorial tail
+    - ext: py
+      href: 56a73d2194505c29f600002d
+      level: 2
+      solution: regular_expression___check_if_divisible_by_0b111__7_
+      text: 'Regular Expression   Check if divisible by 0b111  7 '
+    - ext: py
+      href: 53d40c1e2f13e331fc000c26
+      level: 3
+      solution: the_millionth_fibonacci_kata
+      text: The Millionth Fibonacci Kata
+  name: kupns-aka-kupa
