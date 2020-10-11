@@ -17,7 +17,7 @@ class ModelFieldMeta(type):
                 __init__(self)
             return decorator
 
-        def __init__(self): pass
+        def __init__(self, *args, **kwargs): pass
         if "__init__" in attribute_dict:
             __init__ = attribute_dict["__init__"]
 
@@ -27,14 +27,9 @@ class ModelFieldMeta(type):
 
 
 class ModelFieldBase(object, metaclass=ModelFieldMeta):
-    def getter(self): return self.__default
-
-    def setter(self, value):
-        self.__default = value
 
     blank = False
-    __default = None
-    default = property(getter, setter)
+    default = None
     value = default
 
     def __get__(self, instance, owner):
@@ -44,14 +39,14 @@ class ModelFieldBase(object, metaclass=ModelFieldMeta):
         self.value = value
 
     def validate(self):
-        print(type(self), self.value)
         if self.value is None:
-            if not self.blank:
-                raise ValidationError
-            return True
-        if not self._validate():
+            if self.blank:
+                return True
             raise ValidationError
-        return True
+        if self._validate():
+            return True
+        print(type(self), self.value)
+        raise ValidationError
 
 
 class ModelMeta(type):
@@ -88,8 +83,7 @@ class Model(object, metaclass=ModelMeta):
             object.__setattr__(self, key, value)
 
     def validate(self):
-        return all(v.validate() for v in self.__dict__.values()
-                   if isinstance(v, ModelFieldBase))
+        return all(v.validate() for v in self.__dict__.values() if isinstance(v, ModelFieldBase))
 
 
 class CharField(ModelFieldBase):
@@ -100,10 +94,10 @@ class CharField(ModelFieldBase):
         is_valid = isinstance(self.value, str)
 
         if self.min_length is not None and is_valid:
-            is_valid &= self.min_length < len(self.value)
+            is_valid &= self.min_length <= len(self.value)
 
         if self.max_length is not None and is_valid:
-            is_valid &= len(self.value) < self.max_length
+            is_valid &= len(self.value) <= self.max_length
 
         return is_valid
 
@@ -113,12 +107,12 @@ class IntegerField(ModelFieldBase):
     max_value = None
 
     def _validate(self):
-        is_valid = isinstance(self.value, int)
-        if self.min_value is not None:
-            is_valid &= self.min_value < self.value
+        is_valid = self.value is int
+        if is_valid and self.min_value is not None:
+            is_valid &= self.min_value <= self.value
 
-        if self.max_value is not None:
-            is_valid &= self.value < self.max_value
+        if is_valid and self.max_value is not None:
+            is_valid &= self.value <= self.max_value
 
         return is_valid
 
@@ -132,18 +126,19 @@ class BooleanField(ModelFieldBase):
 class DateTimeField(ModelFieldBase):
     auto_now = False
 
-    def now(self):
-        return datetime.datetime.now()
+    def getter(self):
+        if self.auto_now and self.__default is None:
+            return datetime.datetime.now()
+        return self.__default
 
-    def __new__(cls, *args, **kwargs):
-        if "default" in kwargs:
-            cls.default = kwargs["default"]
-        if "auto_now" in kwargs and kwargs["auto_now"] and "default" not in kwargs:
-            setattr(cls, "default", property(DateTimeField.now, DateTimeField.setter))
-        return object.__new__(cls)
+    def setter(self, value):
+        self.__default = value
+
+    __default = None
+    default = property(getter, setter)
 
     def _validate(self):
-        return isinstance(self.value, datetime.datetime)
+        return isinstance(self.value, (datetime.datetime, property))
 
 
 class EmailField(CharField): 

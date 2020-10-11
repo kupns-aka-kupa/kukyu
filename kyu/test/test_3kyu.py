@@ -4,25 +4,31 @@ from .._3kyu.metaclasses_simple_django_models import *
 from .._3kyu.binomial_expansion import expand
 from .._3kyu.million_fibonacci import fib
 
+default_date = datetime.datetime(2000, 1, 1, 0, 0)
+
 
 class SimpleDjangoModelTestCase(unittest.TestCase):
+
     class User(Model):
         first_name = CharField(max_length=30, default='Adam')
         last_name = CharField(max_length=50)
         email = EmailField()
         is_verified = BooleanField(default=False)
-        date_joined = DateTimeField(auto_now=True)
+        date_joined = DateTimeField(auto_now=True, default=default_date)
         age = IntegerField(min_value=5, max_value=120, blank=True)
 
     def test_date_time_field(self):
         date = DateTimeField(default=datetime.datetime(2000, 1, 1, 0, 0))
+        self.assertIsInstance(date.default, datetime.datetime)
         t1 = date.default
         time.sleep(1)
         t2 = date.default
         self.assertEqual(t1, t2)
+        date = DateTimeField(auto_now=True)
+        self.assertIsInstance(date.default, datetime.datetime)
 
     def test_basic(self):
-        self.assertTrue(not hasattr(self.User, 'first_name'))
+        self.assertFalse(hasattr(self.User, 'first_name'))
         user1 = self.User()
         self.assertEqual(user1.first_name, 'Adam')
         user1.first_name = 'adam'
@@ -36,6 +42,7 @@ class SimpleDjangoModelTestCase(unittest.TestCase):
 
         user = self.User(first_name='Liam', last_name='Smith', email='liam@example.com')
         self.assertEqual(user.first_name, 'Liam')
+        self.assertEqual(user.date_joined, default_date)
         self.assertEqual(user.last_name, 'Smith')
         self.assertEqual(user.email, 'liam@example.com')
 
