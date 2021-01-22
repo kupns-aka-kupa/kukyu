@@ -10,9 +10,34 @@ from .._4kyu.string_iteration import string_func
 from .._4kyu.longest_palindromic_substring import longest_palindromic_substring
 from .._4kyu.format_duration import format_duration
 from .._4kyu.factorial_tail import zeroes
+from .._4kyu.snail import snail
 
 
 class Kata4TestCase(unittest.TestCase):
+
+    def test_snail(self):
+
+        array = [[1, 2, 3],
+                 [4, 5, 6],
+                 [7, 8, 9]]
+        expected = [1, 2, 3, 6, 9, 8, 7, 4, 5]
+
+        self.assertEqual(snail(array), expected)
+
+        array = [[1, 2, 3],
+                 [8, 9, 4],
+                 [7, 6, 5]]
+        expected = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        self.assertEqual(snail(array), expected)
+
+        array = [[1, 2, 3, 4],
+                 [5, 6, 7, 8],
+                 [9, 10, 11, 12],
+                 [13, 14, 15, 16]]
+        expected = [1, 2, 3, 4, 8, 12, 16, 15, 14, 13, 9, 5, 6, 7, 11, 10]
+
+        self.assertEqual(snail(array), expected)
 
     def test_factorial_tail(self):
         self.assertEqual(zeroes(10, 10), 2)
