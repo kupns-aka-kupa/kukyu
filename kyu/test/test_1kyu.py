@@ -28,7 +28,6 @@ class LoopoverTestCase(unittest.TestCase):
                      'ABCDE\nFGHIJ\nKLMNO\nPQRST')
         self.assertIsNotNone(m)
 
-    @unittest.skip('Test 5x5 (1)')
     def test_5x5_1(self):
         m = run_test('ACDBE\nFGHIJ\nKLMNO\nPQRST\nUVWXY',
                      'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY')
