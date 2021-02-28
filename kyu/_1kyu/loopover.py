@@ -4,55 +4,86 @@ from scipy.sparse.csgraph import depth_first_tree
 
 to_char = vectorize(ord)
 
+path = []
+
+
+def extend_path(func):
+    def wrapper(*args):
+        path.append(func(*args))
+    return wrapper
+
 
 def loopover(mixed, solved):
-    return solve(to_char(array(mixed)), to_char(array(solved)))
+    return solve(array(mixed), array(solved))
 
 
 def solve(mixed, solved):
-    matrix = csr_matrix(mixed)
-    print(matrix)
+    print('Solved\n', solved)
+    print('Mixed\n', mixed, '\n')
+
+    up(mixed, 1)
+    print('Mixed\n', mixed, '\n')
     for item in nditer(solved):
-        for i, j in zip(*where(mixed == item)):
+        for row, column in zip(*where(mixed == item)):
+            offset_right(mixed, row)
+            offset_up(mixed, column)
             pass
+        print(mixed)
+        print(path)
+        return path
 
-    print(mixed)
-    return []
-
-
-def right(a, j):
-    horizontal(a, j + 1, 1)
-    return f'R{j}'
+    return path
 
 
-def left(a, j):
-    horizontal(a, j + 1, -1)
-    return f'L{j}'
+def offset_right(a, row):
+    while row != len(a) - 1:
+        right(a, row)
+        row += 1
 
 
-def up(a, i):
-    vertical(a, i + 1, -1)
-    return f'U{i}'
+def offset_up(a, column):
+    while column != 0:
+        up(a, column)
+        column -= 1
 
 
-def down(a, i):
-    vertical(a, i + 1, 1)
-    return f'D{i}'
+@extend_path
+def right(a, row):
+    horizontal(a, row + 1, 1)
+    return f'R{row}'
 
 
-def horizontal(a, j, d):
+@extend_path
+def left(a, row):
+    horizontal(a, row + 1, -1)
+    return f'L{row}'
+
+
+@extend_path
+def up(a, column):
+    vertical(a, column + 1, -1)
+    return f'U{column}'
+
+
+@extend_path
+def down(a, column):
+    vertical(a, column + 1, 1)
+    return f'D{column}'
+
+
+def horizontal(a, row, d):
     """
-    @param j: row
+    @param row: row
     @param a: array
     @param d: direction
     """
-    a[:j, :] = roll(a, d, axis=1)[:j, :]
+    a[row - 1:row, :] = roll(a, d, axis=1)[row - 1:row, :]
 
 
-def vertical(a, i, d):
+def vertical(a, column, direction):
     """
-    @param i: column
+    @param column: column
     @param a: array
-    @param d: direction
+    @param direction: direction
     """
-    a[:, :i] = roll(a, d, axis=0)[:, :i]
+    a[:, column - 1:column] = roll(a, direction, axis=0)[:, column - 1:column]
