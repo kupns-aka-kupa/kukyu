@@ -1,10 +1,11 @@
-from numpy import roll, where, array, nditer, vectorize
+from numpy import roll, where, array, nditer, vectorize, sign
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import depth_first_tree
 
 to_char = vectorize(ord)
 
 path = []
+move_format = '{0}{1}'
 
 
 def extend_path(func):
@@ -18,72 +19,70 @@ def loopover(mixed, solved):
 
 
 def solve(mixed, solved):
-    print('Solved\n', solved)
-    print('Mixed\n', mixed, '\n')
+    cut = solved[:len(solved) - 1, :len(solved) - 1]
+    with nditer(cut, flags=['multi_index']) as it:
+        for item in it:
+            pull(mixed, item, it.multi_index[0])
+            push(mixed, item, it.multi_index[0])
 
-    up(mixed, 1)
-    print('Mixed\n', mixed, '\n')
-    for item in nditer(solved):
-        for row, column in zip(*where(mixed == item)):
-            offset_right(mixed, row)
-            offset_up(mixed, column)
-            pass
-        print(mixed)
-        print(path)
-        return path
-
+    print(mixed)
+    print(len(path), path)
     return path
 
 
-def offset_right(a, row):
-    while row != len(a) - 1:
-        right(a, row)
-        row += 1
+def push(a, item, i):
+    for row, column in zip(*where(a == item)):
+        move(a, row, len(a) - column - 1, horizontal)
+        move(a, len(a) - 1, i - row, vertical)
+        left(a, i)
 
 
-def offset_up(a, column):
-    while column != 0:
-        up(a, column)
-        column -= 1
+def pull(a, item, i):
+    for row, column in zip(*where(a == item)):
+        if i == row:
+            down(a, column)
+            right(a, row + 1)
+            up(a, column)
 
 
-@extend_path
+def move(a, index, steps, func):
+    for _ in range(abs(steps)):
+        func(a, index + 1, sign(steps))
+
+
 def right(a, row):
-    horizontal(a, row + 1, 1)
-    return f'R{row}'
+    return horizontal(a, row + 1, 1)
 
 
-@extend_path
 def left(a, row):
-    horizontal(a, row + 1, -1)
-    return f'L{row}'
+    return horizontal(a, row + 1, -1)
 
 
-@extend_path
 def up(a, column):
-    vertical(a, column + 1, -1)
-    return f'U{column}'
+    return vertical(a, column + 1, -1)
+
+
+def down(a, column):
+    return vertical(a, column + 1, 1)
 
 
 @extend_path
-def down(a, column):
-    vertical(a, column + 1, 1)
-    return f'D{column}'
-
-
-def horizontal(a, row, d):
+def horizontal(a, r, d):
     """
-    @param row: row
+    @param r: row
     @param a: array
     @param d: direction
     """
-    a[row - 1:row, :] = roll(a, d, axis=1)[row - 1:row, :]
+    a[r - 1:r, :] = roll(a, d, axis=1)[r - 1:r, :]
+    return move_format.format('R' if d > 0 else 'L', abs(d))
 
 
-def vertical(a, column, direction):
+@extend_path
+def vertical(a, c, d):
     """
-    @param column: column
+    @param c: column
     @param a: array
-    @param direction: direction
+    @param d: direction
     """
-    a[:, column - 1:column] = roll(a, direction, axis=0)[:, column - 1:column]
+    a[:, c - 1:c] = roll(a, d, axis=0)[:, c - 1:c]
+    return move_format.format('D' if d > 0 else 'U', abs(d))
