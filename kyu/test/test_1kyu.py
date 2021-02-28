@@ -1,5 +1,6 @@
 import unittest
-from kyu._1kyu.loopover import loopover
+from kyu._1kyu.loopover import loopover, right, down
+from numpy import array, array_equal
 
 
 def board(s):
@@ -11,6 +12,28 @@ def run_test(start, end):
 
 
 class LoopoverTestCase(unittest.TestCase):
+
+    def test_horizontal_rotation(self):
+        a = array(board('12\n34'))
+        right(a, 0)
+        self.assertTrue(array_equal(a, array(board('21\n34'))))
+        right(a, 1)
+        self.assertTrue(array_equal(a, array(board('21\n43'))))
+
+        right(a, 0)
+        right(a, 0)
+        self.assertTrue(array_equal(a, array(board('21\n43'))))
+
+    def test_vertical_rotation(self):
+        a = array(board('12\n34'))
+        down(a, 0)
+        self.assertTrue(array_equal(a, array(board('32\n14'))))
+        down(a, 1)
+        self.assertTrue(array_equal(a, array(board('34\n12'))))
+
+        down(a, 0)
+        down(a, 0)
+        self.assertTrue(array_equal(a, array(board('34\n12'))))
 
     def test_2x2_1(self):
         """Test 2x2 (1)"""
