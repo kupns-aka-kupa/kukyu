@@ -1,6 +1,24 @@
 import unittest
-from kyu._1kyu.loopover import loopover, right, down
-from numpy import array, array_equal
+from kyu._1kyu.loopover import loopover, right, down, left, up
+from numpy import array, array_equal, arange
+
+
+def direction(d):
+    if d == 'R':
+        return right
+    elif d == 'L':
+        return left
+    elif d == 'U':
+        return up
+    elif d == 'D':
+        return down
+
+
+def apply_config(a, moves):
+    for m in moves:
+        i = int(m[1:])
+        func = direction(m[0])
+        func(a, i)
 
 
 def board(s):
@@ -35,20 +53,31 @@ class LoopoverTestCase(unittest.TestCase):
         down(a, 0)
         self.assertTrue(array_equal(a, array(board('34\n12'))))
 
-    def test_2x2_1(self):
-        """Test 2x2 (1)"""
-        m = run_test('12\n34', '12\n34')
-        self.assertIsNotNone(m)
+    def test_sub_matrix_stage(self):
+        a = arange(5 * 5).reshape(5, 5)
 
     def test_2x2_1(self):
+        """Test 2x2 (1)"""
+        solved = '12\n34'
+        mixed = '12\n34'
+
+        moves = run_test(mixed, solved)
+        a = array(board(solved))
+
+        apply_config(a, moves)
+
+        self.assertIsNotNone(moves)
+        self.assertTrue(array_equal(a, array(board(solved))))
+
+    def test_2x2_2(self):
         """Test 2x2 (2)"""
         m = run_test('42\n31', '12\n34')
         self.assertIsNotNone(m)
 
     @unittest.skip('Test 4x5')
     def test_4x5_1(self):
-        m = run_test('ACDBE\nFGHIJ\nKLMNO\nPQRST',
-                     'ABCDE\nFGHIJ\nKLMNO\nPQRST')
+        s = 'ABCDE\nFGHIJ\nKLMNO\nPQRST'
+        m = run_test('ACDBE\nFGHIJ\nKLMNO\nPQRST', s)
         self.assertIsNotNone(m)
 
     def test_5x5_1(self):
@@ -56,7 +85,6 @@ class LoopoverTestCase(unittest.TestCase):
                      'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY')
         self.assertIsNotNone(m)
 
-    @unittest.skip('Test 5x5 (2)')
     def test_5x5_2(self):
         m = run_test('ABCDE\nKGHIJ\nPLMNO\nFQRST\nUVWXY',
                      'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY')

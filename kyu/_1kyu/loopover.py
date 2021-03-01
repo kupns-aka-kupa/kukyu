@@ -1,4 +1,4 @@
-from numpy import roll, where, array, nditer, vectorize, sign
+from numpy import roll, where, array, nditer, vectorize, sign, subtract
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import depth_first_tree
 
@@ -11,23 +11,61 @@ move_format = '{0}{1}'
 def extend_path(func):
     def wrapper(*args):
         path.append(func(*args))
+
     return wrapper
 
 
 def loopover(mixed, solved):
-    return solve(array(mixed), array(solved))
+    return Solver(array(mixed), array(solved)).solve()
 
 
-def solve(mixed, solved):
-    cut = solved[:len(solved) - 1, :len(solved) - 1]
-    with nditer(cut, flags=['multi_index']) as it:
-        for item in it:
-            pull(mixed, item, it.multi_index[0])
-            push(mixed, item, it.multi_index[0])
+class Solver:
+    def __init__(self, mixed, solved):
+        self.mixed = mixed
+        self.solved = solved
+        self.x, self.y = subtract(array(mixed.shape), 1)
 
-    print(mixed)
-    print(len(path), path)
-    return path
+    def solve(self):
+        sub_matrix = self.solved[:self.x, :self.x]
+        with nditer(sub_matrix, flags=['multi_index']) as it:
+            for item in it:
+                pull(self.mixed, item, it.multi_index[0])
+                push(self.mixed, item, it.multi_index[0])
+
+        self.last_row()
+        self.last_column()
+
+        return path
+
+    def last_row(self):
+        mask = self.solved[self.x, :self.x]
+
+        for item in self.mixed[self.x, self.x - 1::-1]:
+            if item not in mask:
+                continue
+            for _, column in zip(*where(self.mixed == item)):
+                while self.mixed[self.x, self.x] in mask:
+                    up(self.mixed, self.x)
+
+                move(self.mixed, self.x, self.x - column, horizontal)
+
+        for item in self.solved[self.x, self.x - 1::-1]:
+            for row, column in zip(*where(self.mixed == item)):
+                move(self.mixed, self.x, self.x - row, vertical)
+                right(self.mixed, self.x)
+
+    def last_column(self):
+        m = self.solved[:self.x + 1, self.x]
+        for i in range(1, self.x):
+            for row, column in zip(*where(self.mixed == m[i])):
+                move(self.mixed, self.x, self.x - row, vertical)
+                right(self.mixed, self.x)
+
+                for r, _ in zip(*where(self.mixed == m[i - 1])):
+                    move(self.mixed, self.x, self.x - r - 1, vertical)
+
+                left(self.mixed, self.x)
+        up(self.mixed, self.x)
 
 
 def push(a, item, i):
