@@ -1,6 +1,22 @@
 import unittest
-from kyu._1kyu.loopover import loopover, right, down, left, up
+from kyu._1kyu.loopover import loopover, horizontal, vertical
 from numpy import array, array_equal, arange
+
+
+def right(a, row):
+    return horizontal(a, row + 1, 1)
+
+
+def left(a, row):
+    return horizontal(a, row + 1, -1)
+
+
+def up(a, column):
+    return vertical(a, column + 1, -1)
+
+
+def down(a, column):
+    return vertical(a, column + 1, 1)
 
 
 def direction(d):
