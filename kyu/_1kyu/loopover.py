@@ -1,4 +1,4 @@
-from numpy import roll, where, array, nditer, sign, subtract as sub, in1d
+from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere
 from numpy.ma import masked_array
 
 move_format = '{0}{1}'
@@ -61,12 +61,16 @@ class Solver:
             yield from self.move(self.x, row - i, self.vertical)
             yield self.left(row)
 
-    def pull(self, item, i):
-        for row, column in zip(*where(self.mixed == item)):
-            if i == row:
-                yield self.down(column)
-                yield self.right(row + 1)
-                yield self.up(column)
+    def pull(self, item, row):
+        s = argwhere(self.mixed[row] == item)
+
+        if s.size == 0:
+            return
+
+        for column in s.reshape(1):
+            yield self.down(column)
+            yield self.right(row + 1)
+            yield self.up(column)
 
     def right(self, row):
         return self.horizontal(row + 1, 1)
