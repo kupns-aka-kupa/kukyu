@@ -81,9 +81,13 @@ class LoopoverTestCase(unittest.TestCase):
         self.assertIsNotNone(m)
 
     def test_5x5_1(self):
-        m = run_test('ACDBE\nFGHIJ\nKLMNO\nPQRST\nUVWXY',
-                     'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY')
-        self.assertIsNotNone(m)
+        mixed = 'ACDBE\nFGHIJ\nKLMNO\nPQRST\nUVWXY'
+        solved = 'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY'
+        moves = run_test(mixed, solved)
+        a = array(board(solved))
+
+        apply_config(a, moves)
+        self.assertIsNotNone(moves)
 
     def test_5x5_2(self):
         m = run_test('ABCDE\nKGHIJ\nPLMNO\nFQRST\nUVWXY',
