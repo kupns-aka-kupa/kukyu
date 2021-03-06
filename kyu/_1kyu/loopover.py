@@ -22,7 +22,7 @@ class Solver:
         print(self.mixed)
 
     def first_step(self):
-        with nditer(self.solved[:self.x, :self.x], flags=['multi_index']) as it:
+        with nditer(self.solved[:self.x, :self.y], flags=['multi_index']) as it:
             for item in it:
                 yield from self.pull(item, it.multi_index[0])
                 yield from self.push(item, it.multi_index[0])
@@ -32,39 +32,42 @@ class Solver:
         yield from self.push_last_row()
 
     def last_step(self):
-        column = self.solved[:self.x + 1, self.x]
-        for i in range(1, self.x):
+        column = self.solved[:self.x + 1, self.y]
+        for i in range(1, self.y):
             for row, _ in zip(*where(self.mixed == column[i])):
-                yield from move(self.x, self.x - row, self.vertical)
+                yield from move(self.y, self.x - row, self.vertical)
                 yield self.right(self.x)
 
+                print(self.mixed)
                 for r, _ in zip(*where(self.mixed == column[i - 1])):
-                    yield from move(self.x, self.x - r - 1, self.vertical)
+                    yield from move(self.y, self.x - r - 1, self.vertical)
 
+                print(self.mixed)
                 yield self.left(self.x)
-        yield self.up(self.x)
+                print(self.mixed)
+        yield self.up(self.y)
 
     def stack_last_row(self):
-        mask = self.solved[self.x, :self.x]
-        sliced = self.mixed[self.x, self.x - 1::-1]
+        mask = self.solved[self.x, :self.y]
+        sliced = self.mixed[self.x, self.y - 1::-1]
 
         for item in masked_array(sliced, ~in1d(sliced, mask)).compressed():
             for _, column in zip(*where(self.mixed == item)):
-                while self.mixed[self.x, self.x] in mask:
-                    yield self.up(self.x)
+                while self.mixed[self.x, self.y] in mask:
+                    yield self.up(self.y)
 
-                yield from move(self.x, self.x - column, self.horizontal)
+                yield from move(self.x, self.y - column, self.horizontal)
 
     def push_last_row(self):
-        for item in self.solved[self.x, self.x - 1::-1]:
+        for item in self.solved[self.x, self.y - 1::-1]:
             for row, _ in zip(*where(self.mixed == item)):
-                yield from move(self.x, self.x - row, self.vertical)
+                yield from move(self.y, self.x - row, self.vertical)
                 yield self.right(self.x)
 
     def push(self, item, row):
         for i, column in zip(*where(self.mixed == item)):
-            yield from move(i, self.x - column, self.horizontal)
-            yield from move(self.x, row - i, self.vertical)
+            yield from move(i, self.y - column, self.horizontal)
+            yield from move(self.y, row - i, self.vertical)
             yield self.left(row)
 
     def pull(self, item, row):
@@ -91,7 +94,8 @@ class Solver:
         return self.vertical(column + 1, 1)
 
     def horizontal(self, r, d):
-        return horizontal(self.mixed, r, d)
+        horizontal(self.mixed, r, d)
+        return move_format.format('R' if d > 0 else 'L', abs(r - 1))
 
     def vertical(self, c, d):
         return vertical(self.mixed, c, d)
@@ -109,7 +113,7 @@ def horizontal(a, r, d):
     @param d: direction
     """
     a[r - 1:r, :] = roll(a, d, axis=1)[r - 1:r, :]
-    return move_format.format('R' if d > 0 else 'L', abs(d))
+    return move_format.format('R' if d > 0 else 'L', abs(r - 1))
 
 
 def vertical(a, c, d):
@@ -119,4 +123,4 @@ def vertical(a, c, d):
     @param d: direction
     """
     a[:, c - 1:c] = roll(a, d, axis=0)[:, c - 1:c]
-    return move_format.format('D' if d > 0 else 'U', abs(d))
+    return move_format.format('D' if d > 0 else 'U', abs(c - 1))
