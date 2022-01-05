@@ -1,6 +1,5 @@
 from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere, array_equal
 from numpy.ma import masked_array
-from dataclasses import dataclass
 from enum import Enum
 
 
@@ -14,16 +13,20 @@ class Direction(Enum):
         return self.value
 
 
-@dataclass
 class Move:
     d: Direction
     i: int
+
+    def __init__(self, d, i):
+        assert i >= 0
+
+        self.d = d
+        self.i = i
 
     def __str__(self):
         return '{0}{1}'.format(self.d, self.i)
 
 
-@dataclass(init=False, eq=True)
 class Puzzle:
     a: array
 
@@ -59,8 +62,8 @@ class Puzzle:
             self.__moves[m.d](m.i)
 
 
-def loopover(mixed, solved):
-    return Solver(array(mixed), array(solved)).solve()
+def loopover(mixed: str, solved: str):
+    return Solver(Puzzle.from_str(mixed).a, Puzzle.from_str(solved).a).solve()
 
 
 class Solver:

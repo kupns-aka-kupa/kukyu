@@ -1,15 +1,9 @@
 import unittest
 from kyu._1kyu.loopover import loopover, Puzzle, Move, Direction
-from numpy import array, array_equal, arange
-
-
-
-def board(s):
-    return [list(row) for row in s.split('\n')]
 
 
 def run_test(start, end):
-    return loopover(board(start), board(end))
+    return list(loopover(start, end))
 
 
 class LoopoverTestCase(unittest.TestCase):
@@ -29,29 +23,33 @@ class LoopoverTestCase(unittest.TestCase):
         self.assertIsNotNone(p.a)
 
     def test_horizontal_rotation(self):
-        p = Puzzle.from_str('12\n34')
+        p = Puzzle.from_str('12\n'
+                            '34')
         p.right(0)
-        self.assertTrue(p, Puzzle.from_str('21\n34'))
+        self.assertEqual(p, Puzzle.from_str('21\n'
+                                            '34'))
         p.right(1)
-        self.assertTrue(p, Puzzle.from_str('21\n43'))
+        self.assertEqual(p, Puzzle.from_str('21\n'
+                                            '43'))
 
         p.right(0)
         p.right(0)
-        self.assertTrue(p, Puzzle.from_str('21\n43'))
+        self.assertEqual(p, Puzzle.from_str('21\n'
+                                            '43'))
 
     def test_vertical_rotation(self):
         p = Puzzle.from_str('12\n34')
         p.down(0)
-        self.assertTrue(p, Puzzle.from_str('32\n14'))
+        self.assertEqual(p, Puzzle.from_str('32\n'
+                                            '14'))
         p.down(1)
-        self.assertTrue(p, Puzzle.from_str('34\n12'))
+        self.assertEqual(p, Puzzle.from_str('34\n'
+                                            '12'))
 
         p.down(0)
         p.down(0)
-        self.assertTrue(p, Puzzle.from_str('34\n12'))
-
-    def test_sub_matrix_stage(self):
-        a = arange(5 * 5).reshape(5, 5)
+        self.assertEqual(p, Puzzle.from_str('34\n'
+                                            '12'))
 
     def test_2x2_1(self):
         """Test 2x2 (1)"""
@@ -59,12 +57,13 @@ class LoopoverTestCase(unittest.TestCase):
         mixed = '12\n34'
 
         moves = run_test(mixed, solved)
-        a = array(board(solved))
+        a = Puzzle.from_str(solved)
 
-        apply_config(a, moves)
+        self.assertTrue(moves)
 
-        self.assertIsNotNone(moves)
-        self.assertTrue(array_equal(a, array(board(solved))))
+        a.apply(*moves)
+
+        self.assertEqual(a, Puzzle.from_str(solved))
 
     def test_2x2_2(self):
         """Test 2x2 (2)"""
@@ -76,21 +75,25 @@ class LoopoverTestCase(unittest.TestCase):
         solved = 'ABCDE\nFGHIJ\nKLMNO\nPQRST'
 
         moves = run_test(mixed, solved)
-        a = array(board(solved))
+        a = Puzzle.from_str(solved)
 
-        apply_config(a, moves)
+        self.assertTrue(moves)
 
-        self.assertIsNotNone(moves)
-        self.assertTrue(array_equal(a, array(board(solved))))
+        a.apply(*moves)
+
+        self.assertEqual(a, Puzzle.from_str(solved))
 
     def test_5x5_1(self):
         mixed = 'ACDBE\nFGHIJ\nKLMNO\nPQRST\nUVWXY'
         solved = 'ABCDE\nFGHIJ\nKLMNO\nPQRST\nUVWXY'
-        moves = run_test(mixed, solved)
-        a = array(board(solved))
 
-        apply_config(a, moves)
-        self.assertIsNotNone(moves)
+        moves = run_test(mixed, solved)
+        a = Puzzle.from_str(solved)
+
+        self.assertTrue(moves)
+
+        a.apply(*moves)
+        self.assertTrue(moves)
 
     def test_5x5_2(self):
         m = run_test('ABCDE\nKGHIJ\nPLMNO\nFQRST\nUVWXY',
