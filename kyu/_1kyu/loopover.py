@@ -1,7 +1,62 @@
-from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere
+from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere, array_equal
 from numpy.ma import masked_array
+from dataclasses import dataclass
+from enum import Enum
 
-move_format = '{0}{1}'
+
+class Direction(Enum):
+    Up = 'U'
+    Down = 'D'
+    Right = 'R'
+    Left = 'L'
+
+    def __str__(self):
+        return self.value
+
+
+@dataclass
+class Move:
+    d: Direction
+    i: int
+
+    def __str__(self):
+        return '{0}{1}'.format(self.d, self.i)
+
+
+@dataclass(init=False, eq=True)
+class Puzzle:
+    a: array
+
+    def __init__(self):
+        self.__moves = {Direction.Up: self.up,
+                        Direction.Down: self.down,
+                        Direction.Left: self.left,
+                        Direction.Right: self.right}
+
+    def __eq__(self, other):
+        return array_equal(self.a, other.a)
+
+    @staticmethod
+    def from_str(s: str):
+        p = Puzzle()
+        p.a = array(list(map(list, s.split('\n'))))
+        return p
+
+    def right(self, row):
+        return horizontal(self.a, row + 1, 1)
+
+    def left(self, row):
+        return horizontal(self.a, row + 1, -1)
+
+    def up(self, column):
+        return vertical(self.a, column + 1, -1)
+
+    def down(self, column):
+        return vertical(self.a, column + 1, 1)
+
+    def apply(self, *moves: Move):
+        for m in moves:
+            self.__moves[m.d](m.i)
 
 
 def loopover(mixed, solved):
@@ -95,7 +150,7 @@ class Solver:
 
     def horizontal(self, r, d):
         horizontal(self.mixed, r, d)
-        return move_format.format('R' if d > 0 else 'L', abs(r - 1))
+        return Move(Direction.Right if d > 0 else Direction.Left, abs(r - 1))
 
     def vertical(self, c, d):
         return vertical(self.mixed, c, d)
@@ -113,7 +168,7 @@ def horizontal(a, r, d):
     @param d: direction
     """
     a[r - 1:r, :] = roll(a, d, axis=1)[r - 1:r, :]
-    return move_format.format('R' if d > 0 else 'L', abs(r - 1))
+    return Move(Direction.Right if d > 0 else Direction.Left, abs(r - 1))
 
 
 def vertical(a, c, d):
@@ -123,4 +178,4 @@ def vertical(a, c, d):
     @param d: direction
     """
     a[:, c - 1:c] = roll(a, d, axis=0)[:, c - 1:c]
-    return move_format.format('D' if d > 0 else 'U', abs(c - 1))
+    return Move(Direction.Down if d > 0 else Direction.Up, abs(c - 1))

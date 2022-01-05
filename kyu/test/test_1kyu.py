@@ -1,40 +1,7 @@
 import unittest
-from kyu._1kyu.loopover import loopover, horizontal, vertical
+from kyu._1kyu.loopover import loopover, Puzzle, Move, Direction
 from numpy import array, array_equal, arange
 
-
-def right(a, row):
-    return horizontal(a, row + 1, 1)
-
-
-def left(a, row):
-    return horizontal(a, row + 1, -1)
-
-
-def up(a, column):
-    return vertical(a, column + 1, -1)
-
-
-def down(a, column):
-    return vertical(a, column + 1, 1)
-
-
-def direction(d):
-    if d == 'R':
-        return right
-    elif d == 'L':
-        return left
-    elif d == 'U':
-        return up
-    elif d == 'D':
-        return down
-
-
-def apply_config(a, moves):
-    for m in moves:
-        i = int(m[1:])
-        func = direction(m[0])
-        func(a, i)
 
 
 def board(s):
@@ -47,27 +14,41 @@ def run_test(start, end):
 
 class LoopoverTestCase(unittest.TestCase):
 
-    def test_horizontal_rotation(self):
-        a = array(board('12\n34'))
-        right(a, 0)
-        self.assertTrue(array_equal(a, array(board('21\n34'))))
-        right(a, 1)
-        self.assertTrue(array_equal(a, array(board('21\n43'))))
+    def test_move_class(self):
+        self.assertEqual(str(Move(Direction.Up, 1)), "U1")
+        self.assertEqual(str(Move(Direction.Down, 0)), "D0")
+        self.assertEqual(str(Move(Direction.Right, -2)), "R-2")
+        self.assertEqual(str(Move(Direction.Left, 4)), "L4")
 
-        right(a, 0)
-        right(a, 0)
-        self.assertTrue(array_equal(a, array(board('21\n43'))))
+    def test_puzzle_from_str(self):
+        p = Puzzle.from_str('ACDBE\nFGHIJ\nKLMNO\nPQRST')
+        self.assertIsNotNone(p.a)
+        self.assertEqual(p.a.shape, (4, 5))
+        p = Puzzle.from_str('12\n34')
+        self.assertEqual(p.a.shape, (2, 2))
+        self.assertIsNotNone(p.a)
+
+    def test_horizontal_rotation(self):
+        p = Puzzle.from_str('12\n34')
+        p.right(0)
+        self.assertTrue(p, Puzzle.from_str('21\n34'))
+        p.right(1)
+        self.assertTrue(p, Puzzle.from_str('21\n43'))
+
+        p.right(0)
+        p.right(0)
+        self.assertTrue(p, Puzzle.from_str('21\n43'))
 
     def test_vertical_rotation(self):
-        a = array(board('12\n34'))
-        down(a, 0)
-        self.assertTrue(array_equal(a, array(board('32\n14'))))
-        down(a, 1)
-        self.assertTrue(array_equal(a, array(board('34\n12'))))
+        p = Puzzle.from_str('12\n34')
+        p.down(0)
+        self.assertTrue(p, Puzzle.from_str('32\n14'))
+        p.down(1)
+        self.assertTrue(p, Puzzle.from_str('34\n12'))
 
-        down(a, 0)
-        down(a, 0)
-        self.assertTrue(array_equal(a, array(board('34\n12'))))
+        p.down(0)
+        p.down(0)
+        self.assertTrue(p, Puzzle.from_str('34\n12'))
 
     def test_sub_matrix_stage(self):
         a = arange(5 * 5).reshape(5, 5)
