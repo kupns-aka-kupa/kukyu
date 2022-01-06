@@ -70,6 +70,33 @@ class PuzzleTestCase(unittest.TestCase):
 
 
 class LoopoverTestCase(unittest.TestCase):
+    def test_3x4(self):
+        def data():
+            yield """EJGI
+LFHK
+BCAD
+""", """ABCD
+EFGH
+IJKL"""
+
+    def test_8x8(self):
+        def data():
+            yield """BhaisSzx
+pGjgATCc
+4r28Id3k
+YbβtNJEq
+yU7OlLFW
+VαPDHe5n
+vo61RQwZ
+KM0Xu9fm""",
+            """ABCDEFGH
+IJKLMNOP
+QRSTUVWX
+YZabcdef
+ghijklmn
+opqrstuv
+wxyz0123
+456789αβ"""
 
     def test_2x2(self):
         def data():
@@ -95,7 +122,7 @@ class LoopoverTestCase(unittest.TestCase):
 
         a.apply(*moves)
 
-        self.assertEqual(a, Puzzle.from_str(solved))
+        self.assertTrue(array_equal(a, Puzzle.from_str(solved)))
 
     def test_5x5_1(self):
         mixed = 'ACDBE\nFGHIJ\nKLMNO\nPQRST\nUVWXY'
