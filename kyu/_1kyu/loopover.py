@@ -1,6 +1,10 @@
-from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere, ndarray
+from numpy import roll, where, array, nditer, subtract as sub, in1d, argwhere, ndarray, asarray
 from numpy.ma import masked_array
 from enum import Enum
+
+
+def loopover(mixed: str, solved: str):
+    return Solver(Puzzle.from_str(mixed), Puzzle.from_str(solved)).solve()
 
 
 class Direction(Enum):
@@ -26,22 +30,25 @@ class Move:
     def __str__(self):
         return '{0}{1}'.format(self.d, self.i)
 
+    @classmethod
+    def build(cls, i, steps, d: Direction):
+        for _ in range(abs(steps)):
+            yield Move(d, i)
+
 
 class Puzzle(ndarray):
-    
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, *args, **kwargs)
 
-    def __init__(self, shape):
-        super().__init__(shape)
-        self.__moves = {Direction.Up: self.up,
-                        Direction.Down: self.down,
-                        Direction.Left: self.left,
-                        Direction.Right: self.right}
+    def __new__(cls, a):
+        self = asarray(a).view(cls)
+        self.moves = {Direction.Up: self.up,
+                      Direction.Down: self.down,
+                      Direction.Left: self.left,
+                      Direction.Right: self.right}
+        return self
 
     @staticmethod
     def from_str(s: str):
-        return array(list(map(list, s.split('\n')))).view(Puzzle)
+        return Puzzle(list(map(list, s.split('\n'))))
 
     def right(self, row):
         return horizontal(self, row + 1, 1)
@@ -61,13 +68,9 @@ class Puzzle(ndarray):
     def vertical(self, c, d):
         return vertical(self, c, d)
 
-    def apply(self, *moves: Move):
-        for m in moves:
-            self.__moves[m.d](m.i)
-
-
-def loopover(mixed: str, solved: str):
-    return Solver(Puzzle.from_str(mixed), Puzzle.from_str(solved)).solve()
+    def apply(self, *args: Move):
+        for m in args:
+            yield self.moves[m.d](m.i)
 
 
 class Solver:
@@ -88,13 +91,13 @@ class Solver:
         print(self.mixed)
 
     def first_step(self):
-        print(self.solved[:self.x, :self.y])
+        """Solve (m-1, n-1) rectangle"""
+
         with nditer(self.solved[:self.x, :self.y], flags=['multi_index']) as it:
             for item in it:
-                yield from self.pull(item, it.multi_index[0])
-                print(self.mixed)
-                yield from self.push(item, it.multi_index[0])
-                print(self.mixed)
+                i, _ = it.multi_index
+                yield from self.pull(item, i)
+                yield from self.push(item, i)
 
     def second_step(self):
         yield from self.stack_last_row()
@@ -104,12 +107,13 @@ class Solver:
         column = self.solved[:self.x + 1, self.y]
         for i in range(1, self.y):
             for row, _ in zip(*where(self.mixed == column[i])):
-                yield from move(self.y, self.x - row, self.mixed.vertical)
+                yield from self.mixed.apply(*Move.build(self.y, self.x - row, Direction.Up))
+
                 yield self.mixed.right(self.x)
 
                 print(self.mixed)
                 for r, _ in zip(*where(self.mixed == column[i - 1])):
-                    yield from move(self.y, self.x - r - 1, self.mixed.vertical)
+                    yield from self.mixed.apply(*Move.build(self.y, self.x - r - 1, Direction.Up))
 
                 print(self.mixed)
                 yield self.mixed.left(self.x)
@@ -125,18 +129,21 @@ class Solver:
                 while self.mixed[self.x, self.y] in mask:
                     yield self.mixed.up(self.y)
 
-                yield from move(self.x, self.y - column, self.mixed.horizontal)
+                yield from self.mixed.apply(*Move.build(self.x, self.y - column, Direction.Right))
 
     def push_last_row(self):
         for item in self.solved[self.x, self.y - 1::-1]:
             for row, _ in zip(*where(self.mixed == item)):
-                yield from move(self.y, self.x - row, self.mixed.vertical)
+                yield from self.mixed.apply(*Move.build(self.y, self.x - row, Direction.Up))
                 yield self.mixed.right(self.x)
 
     def push(self, item, row):
         for i, column in zip(*where(self.mixed == item)):
-            yield from move(i, self.y - column, self.mixed.horizontal)
-            yield from move(self.y, row - i, self.mixed.vertical)
+            r = list(Move.build(i, self.y - column, Direction.Right))
+            yield from self.mixed.apply(*r)
+
+            u = list(Move.build(self.y, row - i, Direction.Up))
+            yield from self.mixed.apply(*u)
             yield self.mixed.left(row)
 
     def pull(self, item, row):
@@ -149,11 +156,6 @@ class Solver:
             yield self.mixed.down(column)
             yield self.mixed.right(row + 1)
             yield self.mixed.up(column)
-
-
-def move(index, steps, func):
-    for _ in range(abs(steps)):
-        yield func(index + 1, sign(steps))
 
 
 def horizontal(a, r, d):

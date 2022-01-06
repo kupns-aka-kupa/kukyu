@@ -55,6 +55,19 @@ class PuzzleTestCase(unittest.TestCase):
         self.assertTrue(array_equal(p, Puzzle.from_str('34\n'
                                                        '12')))
 
+    def test_move_lang(self):
+        p = Puzzle.from_str('12\n34')
+        p.apply(Move(Direction.Down, 0))
+        self.assertTrue(array_equal(p, Puzzle.from_str('32\n'
+                                                       '14')))
+        p.apply(Move(Direction.Down, 1))
+        self.assertTrue(array_equal(p, Puzzle.from_str('34\n'
+                                                       '12')))
+
+        p.apply(*iter([]))
+        self.assertTrue(array_equal(p, Puzzle.from_str('34\n'
+                                                       '12')))
+
 
 class LoopoverTestCase(unittest.TestCase):
 
