@@ -1,4 +1,4 @@
-from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere, array_equal
+from numpy import roll, where, array, nditer, sign, subtract as sub, in1d, argwhere, ndarray
 from numpy.ma import masked_array
 from enum import Enum
 
@@ -27,35 +27,39 @@ class Move:
         return '{0}{1}'.format(self.d, self.i)
 
 
-class Puzzle:
-    a: array
+class Puzzle(ndarray):
+    
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, *args, **kwargs)
 
-    def __init__(self):
+    def __init__(self, shape):
+        super().__init__(shape)
         self.__moves = {Direction.Up: self.up,
                         Direction.Down: self.down,
                         Direction.Left: self.left,
                         Direction.Right: self.right}
 
-    def __eq__(self, other):
-        return array_equal(self.a, other.a)
-
     @staticmethod
     def from_str(s: str):
-        p = Puzzle()
-        p.a = array(list(map(list, s.split('\n'))))
-        return p
+        return array(list(map(list, s.split('\n')))).view(Puzzle)
 
     def right(self, row):
-        return horizontal(self.a, row + 1, 1)
+        return horizontal(self, row + 1, 1)
 
     def left(self, row):
-        return horizontal(self.a, row + 1, -1)
+        return horizontal(self, row + 1, -1)
 
     def up(self, column):
-        return vertical(self.a, column + 1, -1)
+        return vertical(self, column + 1, -1)
 
     def down(self, column):
-        return vertical(self.a, column + 1, 1)
+        return vertical(self, column + 1, 1)
+
+    def horizontal(self, r, d):
+        return horizontal(self, r, d)
+
+    def vertical(self, c, d):
+        return vertical(self, c, d)
 
     def apply(self, *moves: Move):
         for m in moves:
@@ -63,27 +67,34 @@ class Puzzle:
 
 
 def loopover(mixed: str, solved: str):
-    return Solver(Puzzle.from_str(mixed).a, Puzzle.from_str(solved).a).solve()
+    return Solver(Puzzle.from_str(mixed), Puzzle.from_str(solved)).solve()
 
 
 class Solver:
-    def __init__(self, mixed, solved):
+    def __init__(self, mixed: Puzzle, solved: Puzzle):
         self.mixed = mixed
         self.solved = solved
+
+        assert mixed.shape == solved.shape
+
         self.x, self.y = sub(array(mixed.shape), 1)
 
     def solve(self):
+        print(self.mixed)
         yield from self.first_step()
-        yield from self.second_step()
-        yield from self.last_step()
+        # yield from self.second_step()
+        # yield from self.last_step()
 
         print(self.mixed)
 
     def first_step(self):
+        print(self.solved[:self.x, :self.y])
         with nditer(self.solved[:self.x, :self.y], flags=['multi_index']) as it:
             for item in it:
                 yield from self.pull(item, it.multi_index[0])
+                print(self.mixed)
                 yield from self.push(item, it.multi_index[0])
+                print(self.mixed)
 
     def second_step(self):
         yield from self.stack_last_row()
@@ -93,17 +104,17 @@ class Solver:
         column = self.solved[:self.x + 1, self.y]
         for i in range(1, self.y):
             for row, _ in zip(*where(self.mixed == column[i])):
-                yield from move(self.y, self.x - row, self.vertical)
-                yield self.right(self.x)
+                yield from move(self.y, self.x - row, self.mixed.vertical)
+                yield self.mixed.right(self.x)
 
                 print(self.mixed)
                 for r, _ in zip(*where(self.mixed == column[i - 1])):
-                    yield from move(self.y, self.x - r - 1, self.vertical)
+                    yield from move(self.y, self.x - r - 1, self.mixed.vertical)
 
                 print(self.mixed)
-                yield self.left(self.x)
+                yield self.mixed.left(self.x)
                 print(self.mixed)
-        yield self.up(self.y)
+        yield self.mixed.up(self.y)
 
     def stack_last_row(self):
         mask = self.solved[self.x, :self.y]
@@ -112,21 +123,21 @@ class Solver:
         for item in masked_array(sliced, ~in1d(sliced, mask)).compressed():
             for _, column in zip(*where(self.mixed == item)):
                 while self.mixed[self.x, self.y] in mask:
-                    yield self.up(self.y)
+                    yield self.mixed.up(self.y)
 
-                yield from move(self.x, self.y - column, self.horizontal)
+                yield from move(self.x, self.y - column, self.mixed.horizontal)
 
     def push_last_row(self):
         for item in self.solved[self.x, self.y - 1::-1]:
             for row, _ in zip(*where(self.mixed == item)):
-                yield from move(self.y, self.x - row, self.vertical)
-                yield self.right(self.x)
+                yield from move(self.y, self.x - row, self.mixed.vertical)
+                yield self.mixed.right(self.x)
 
     def push(self, item, row):
         for i, column in zip(*where(self.mixed == item)):
-            yield from move(i, self.y - column, self.horizontal)
-            yield from move(self.y, row - i, self.vertical)
-            yield self.left(row)
+            yield from move(i, self.y - column, self.mixed.horizontal)
+            yield from move(self.y, row - i, self.mixed.vertical)
+            yield self.mixed.left(row)
 
     def pull(self, item, row):
         s = argwhere(self.mixed[row] == item)
@@ -135,28 +146,9 @@ class Solver:
             return
 
         for column in s.reshape(1):
-            yield self.down(column)
-            yield self.right(row + 1)
-            yield self.up(column)
-
-    def right(self, row):
-        return self.horizontal(row + 1, 1)
-
-    def left(self, row):
-        return self.horizontal(row + 1, -1)
-
-    def up(self, column):
-        return self.vertical(column + 1, -1)
-
-    def down(self, column):
-        return self.vertical(column + 1, 1)
-
-    def horizontal(self, r, d):
-        horizontal(self.mixed, r, d)
-        return Move(Direction.Right if d > 0 else Direction.Left, abs(r - 1))
-
-    def vertical(self, c, d):
-        return vertical(self.mixed, c, d)
+            yield self.mixed.down(column)
+            yield self.mixed.right(row + 1)
+            yield self.mixed.up(column)
 
 
 def move(index, steps, func):
