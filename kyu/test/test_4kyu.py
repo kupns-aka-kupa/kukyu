@@ -11,9 +11,35 @@ from .._4kyu.longest_palindromic_substring import longest_palindromic_substring
 from .._4kyu.format_duration import format_duration
 from .._4kyu.factorial_tail import zeroes
 from .._4kyu.snail import snail
+from .._4kyu.sum_of_perfect_square import sum_of_squares
 
 
 class Kata4TestCase(unittest.TestCase):
+
+    def test_sum_of_perfect_square(self):
+        self.assertEqual(sum_of_squares(19), 3)  # 9, 9, 1
+        # self.assertEqual(sum_of_squares(18), 2)  # 9, 9
+
+        self.assertEqual(sum_of_squares(15), 4)
+        self.assertEqual(sum_of_squares(16), 1)
+        self.assertEqual(sum_of_squares(17), 2)
+        
+        self.assertEqual(sum_of_squares(2017), 2)
+        self.assertEqual(sum_of_squares(1008), 3)
+        self.assertEqual(sum_of_squares(4000), 2)
+        # self.assertEqual(sum_of_squares(12321), 1)
+        # self.assertEqual(sum_of_squares(3456), 2)
+
+        # self.assertEqual(sum_of_squares(661915703), 4)
+        # self.assertEqual(sum_of_squares(999887641), 1)
+        # self.assertEqual(sum_of_squares(999950886), 3)
+        # self.assertEqual(sum_of_squares(999951173), 2)
+        # self.assertEqual(sum_of_squares(999998999), 1)
+
+        # self.assertEqual(sum_of_squares(934828728), 3)
+        # self.assertEqual(sum_of_squares(663367237), 2)
+        # self.assertEqual(sum_of_squares(537688815), 4)
+        # self.assertEqual(sum_of_squares(874270400), 3)
 
     def test_snail(self):
 
