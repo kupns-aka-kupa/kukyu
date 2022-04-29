@@ -17,6 +17,14 @@ def program_text_escape(text: str):
         yield r
 
 
+class Reg:
+    def __get__(self, obj, objtype=None):
+        return obj.registers.get(self)
+
+    def __set__(self, obj, value):
+        obj.registers[self] = value
+
+
 class Program(metaclass=Compiler):
     stdout = io.StringIO()
     registers = {}
@@ -24,15 +32,24 @@ class Program(metaclass=Compiler):
     instructions = []
     pointer = 0
     stack = []
+    compare = 0
 
     def parse_op_line(self, line: str):
         s = line.partition(' ')
         yield getattr(self, s[0])
-        args = list(map(str.strip, filter(None, s[2].partition(','))))
+        args = list(map(str.strip, filter(None, s[2].split(','))))
         if len(args) > 0:
-            yield args[0]
+            yield args[0].strip('\'')
+        if len(args) > 1:
+            if s[0] != 'msg':
+                setattr(Program, args[0], Reg())
+            if args[1].isnumeric():
+                yield int(args[1])
+            else:
+                yield args[1].strip('\'')
         if len(args) > 2:
-            yield int(args[2]) if args[2].isnumeric() else args[2]
+            for a in args[2:]:
+                yield a.strip('\'')
 
     def __init__(self, text):
         for i, s in enumerate(program_text_escape(text)):
@@ -44,20 +61,20 @@ class Program(metaclass=Compiler):
     def run(self):
         while self.pointer != -1:
             i, *args = self.instructions[self.pointer]
-            print(args)
+            print(i.__name__, ' '.join(map(str, args)))
             i(*args)
             self.pointer += 1
 
         return self.stdout.getvalue()
 
-    def mov(self, x, y):
-        op.setitem(self.registers, x, self.registers[y] if y in self.registers else y)
+    def mov(self, reg, val):
+        setattr(self, reg, getattr(self, val) if isinstance(val, str) else val)
 
-    def add(self, x, y):
-        self.registers[x] += self.registers[y] if y in self.registers else y
+    def add(self, reg, val):
+        self.mov(reg, getattr(self, reg) + (getattr(self, val) if isinstance(val, str) else val))
 
-    def sub(self, x, y):
-        self.add(x, -y)
+    def sub(self, reg, val):
+        self.add(reg, -(getattr(self, val) if isinstance(val, str) else val))
 
     def inc(self, reg):
         self.add(reg, 1)
@@ -65,46 +82,56 @@ class Program(metaclass=Compiler):
     def dec(self, reg):
         self.add(reg, -1)
 
-    def mul(self, x, y):
-        self.registers[x] *= self.registers[y] if y in self.registers else y
+    def mul(self, reg, val):
+        self.mov(reg, getattr(self, reg) * getattr(self, val) if isinstance(val, str) else val)
 
-    def div(self, x, y):
-        self.registers[x] //= self.registers[y] if y in self.registers else y
+    def div(self, reg, val):
+        self.mov(reg, getattr(self, reg) // getattr(self, val) if isinstance(val, str) else val)
 
     def call(self, label):
         self.stack.append(self.pointer)
-        self.pointer = self.labels[label]
+        self.jmp(label)
 
     def ret(self):
         self.pointer = self.stack.pop()
 
-    def jmp(self):
-        pass
+    def jmp(self, label):
+        self.pointer = self.labels[label]
 
-    def cmp(self):
-        pass
+    def cmp(self, left, right):
+        self.compare = getattr(self, left) - (getattr(self, right) if isinstance(right, str) else right)
 
-    def jne(self):
-        pass
+    def jne(self, label):
+        if self.compare != 0:
+            self.jmp(label)
 
-    def je(self):
-        pass
+    def je(self, label):
+        if self.compare == 0:
+            self.jmp(label)
 
-    def jge(self):
-        pass
+    def jge(self, label):
+        if self.compare >= 0:
+            self.jmp(label)
 
-    def jg(self):
-        pass
+    def jg(self, label):
+        if self.compare > 0:
+            self.jmp(label)
 
-    def jle(self):
-        pass
+    def jle(self, label):
+        if self.compare <= 0:
+            self.jmp(label)
 
-    def jl(self):
-        pass
+    def jl(self, label):
+        if self.compare < 0:
+            self.jmp(label)
 
     def msg(self, *args, **kwargs):
         with contextlib.redirect_stdout(self.stdout):
-            print(*args, **kwargs)
+            for a in args:
+                if hasattr(self, a):
+                    print(getattr(self, a), **kwargs, end='')
+                else:
+                    print(a, **kwargs, end='')
 
     def end(self):
         self.pointer = -2
