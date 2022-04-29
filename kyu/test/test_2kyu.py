@@ -18,7 +18,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program), '(5+1)/2 = 3')
+        self.assertEqual(assembler_interpreter(program), '(5+1)/2 = 3')
 
         program_factorial = '''
         mov   a, 5
@@ -40,7 +40,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program_factorial), '5! = 120')
+        self.assertEqual(assembler_interpreter(program_factorial), '5! = 120')
 
         program_fibonacci = '''
         mov   a, 8            ; value
@@ -74,7 +74,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program_fibonacci), 'Term 8 of Fibonacci series is: 21')
+        self.assertEqual(assembler_interpreter(program_fibonacci), 'Term 8 of Fibonacci series is: 21')
 
         program_mod = '''
         mov   a, 11           ; value1
@@ -93,7 +93,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program_mod), 'mod(11, 3) = 2')
+        self.assertEqual(assembler_interpreter(program_mod), 'mod(11, 3) = 2')
 
         program_gcd = '''
         mov   a, 81         ; value1
@@ -143,7 +143,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program_gcd), 'gcd(81, 153) = 9')
+        self.assertEqual(assembler_interpreter(program_gcd), 'gcd(81, 153) = 9')
 
         program_fail = '''
         call  func1
@@ -161,7 +161,7 @@ class Kata2TestCase(unittest.TestCase):
             msg 'This program should return -1'
         '''
 
-        self.assertEquals(assembler_interpreter(program_fail), -1)
+        self.assertEqual(assembler_interpreter(program_fail), -1)
 
         program_power = '''
         mov   a, 2            ; value1
@@ -187,7 +187,7 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        self.assertEquals(assembler_interpreter(program_power), '2^10 = 1024')
+        self.assertEqual(assembler_interpreter(program_power), '2^10 = 1024')
 
     def test_check_divisible_by_7(self):
         for num in range(0, 101):

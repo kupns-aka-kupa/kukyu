@@ -21,55 +21,62 @@ class Program(metaclass=Compiler):
     stdout = io.StringIO()
     registers = {}
     labels = {}
-    op = []
+    instructions = []
+    pointer = 0
+    stack = []
 
     def parse_op_line(self, line: str):
-        return getattr(self, line.split()[0])
+        s = line.partition(' ')
+        yield getattr(self, s[0])
+        args = list(map(str.strip, filter(None, s[2].partition(','))))
+        if len(args) > 0:
+            yield args[0]
+        if len(args) > 2:
+            yield int(args[2]) if args[2].isnumeric() else args[2]
 
     def __init__(self, text):
         for i, s in enumerate(program_text_escape(text)):
             if s.endswith(':'):
-                self.labels[s.rstrip(':')] = i
+                self.labels[s.rstrip(':')] = i - len(self.labels) - 1
             else:
-                self.op += self.parse_op_line(s)
-
-        print(self.op)
-
-    def load(self, register):
-        return self.registers.get(register)
-
-    def call(self):
-        pass
-
-    def ret(self):
-        pass
+                self.instructions.append(tuple(self.parse_op_line(s)))
 
     def run(self):
-        for o in self.op:
-            o
+        while self.pointer != -1:
+            i, *args = self.instructions[self.pointer]
+            print(args)
+            i(*args)
+            self.pointer += 1
+
         return self.stdout.getvalue()
 
+    def mov(self, x, y):
+        op.setitem(self.registers, x, self.registers[y] if y in self.registers else y)
 
-    def mov(self):
-        pass
+    def add(self, x, y):
+        self.registers[x] += self.registers[y] if y in self.registers else y
 
-    def inc(self):
-        pass
+    def sub(self, x, y):
+        self.add(x, -y)
 
-    def dec(self):
-        pass
+    def inc(self, reg):
+        self.add(reg, 1)
 
-    def add(self):
-        pass
+    def dec(self, reg):
+        self.add(reg, -1)
 
-    def sub(self):
-        pass
+    def mul(self, x, y):
+        self.registers[x] *= self.registers[y] if y in self.registers else y
 
-    def mul(self):
-        pass
+    def div(self, x, y):
+        self.registers[x] //= self.registers[y] if y in self.registers else y
 
-    def div(self):
-        pass
+    def call(self, label):
+        self.stack.append(self.pointer)
+        self.pointer = self.labels[label]
+
+    def ret(self):
+        self.pointer = self.stack.pop()
 
     def jmp(self):
         pass
@@ -95,18 +102,12 @@ class Program(metaclass=Compiler):
     def jl(self):
         pass
 
-    def call(self):
-        pass
-
-    def ret(self):
-        pass
-
     def msg(self, *args, **kwargs):
         with contextlib.redirect_stdout(self.stdout):
             print(*args, **kwargs)
 
     def end(self):
-        pass
+        self.pointer = -2
 
 
 def assembler_interpreter(program):
