@@ -3,12 +3,12 @@ import time
 from .._3kyu.metaclasses_simple_django_models import *
 from .._3kyu.binomial_expansion import expand
 from .._3kyu.million_fibonacci import fib
+from .._3kyu.closest_pair import closest_pair
 
 default_date = datetime.datetime(2000, 1, 1, 0, 0)
 
 
 class SimpleDjangoModelTestCase(unittest.TestCase):
-
     class User(Model):
         first_name = CharField(max_length=30, default='Adam')
         last_name = CharField(max_length=50)
@@ -67,6 +67,20 @@ class SimpleDjangoModelTestCase(unittest.TestCase):
 
 
 class Kata3TestCase(unittest.TestCase):
+    def test_closest_pair(self):
+        points = (
+            (2, 2),  # A
+            (2, 8),  # B
+            (5, 5),  # C
+            (6, 3),  # D
+            (6, 7),  # E
+            (7, 4),  # F
+            (7, 9)  # G
+        )
+        expected = ((6, 3), (7, 4))
+
+        self.assertIn(closest_pair(points), expected)
+
     def test_millionth_fibonacci(self):
         self.assertEqual(fib(0), 0)
         self.assertEqual(fib(1), 1)

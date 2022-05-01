@@ -11,12 +11,25 @@ from .._4kyu.longest_palindromic_substring import longest_palindromic_substring
 from .._4kyu.format_duration import format_duration
 from .._4kyu.factorial_tail import zeroes
 from .._4kyu.snail import snail
+from .._4kyu.observed_pin import get_pins
 
 
 class Kata4TestCase(unittest.TestCase):
 
-    def test_snail(self):
+    def test_observed_pin(self):
+        expectations = [
+            ('8', ['5', '7', '8', '9', '0']),
+            ('11', ["11", "22", "44", "12", "21", "14", "41", "24", "42"]),
+            ('369',
+             ["339", "366", "399", "658", "636", "258", "268", "669", "668", "266", "369", "398", "256",
+              "296", "259", "368", "638", "396", "238", "356", "659", "639", "666", "359", "336", "299",
+              "338", "696", "269", "358", "656", "698", "699", "298", "236", "239"])
+        ]
+        for e, r in expectations:
+            pins = get_pins(e)
+            self.assertEqual(sorted(pins), sorted(r))
 
+    def test_snail(self):
         array = [[1, 2, 3],
                  [4, 5, 6],
                  [7, 8, 9]]
