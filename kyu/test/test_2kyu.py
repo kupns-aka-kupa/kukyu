@@ -3,8 +3,9 @@ from .._2kyu.regular_expression___check_if_divisible_by_0b111__7_ import solutio
 from .._2kyu.assembler_interpreter import assembler_interpreter
 
 
-class Kata2TestCase(unittest.TestCase):
-    def test_asm(self):
+class AsmInterpreterTestCase(unittest.TestCase):
+
+    def test_first_program(self):
         program = '''
         ; My first program
         mov  a, 5
@@ -18,8 +19,9 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        # self.assertEqual(assembler_interpreter(program), '(5+1)/2 = 3')
+        self.assertEqual(assembler_interpreter(program), '(5+1)/2 = 3')
 
+    def test_factorial(self):
         program_factorial = '''
         mov   a, 5
         mov   b, a
@@ -40,8 +42,9 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        # self.assertEqual(assembler_interpreter(program_factorial), '5! = 120')
+        self.assertEqual(assembler_interpreter(program_factorial), '5! = 120')
 
+    def test_fibonacci(self):
         program_fibonacci = '''
         mov   a, 8            ; value
         mov   b, 0            ; next
@@ -74,8 +77,9 @@ class Kata2TestCase(unittest.TestCase):
             ret
         '''
 
-        # self.assertEqual(assembler_interpreter(program_fibonacci), 'Term 8 of Fibonacci series is: 21')
+        self.assertEqual(assembler_interpreter(program_fibonacci), 'Term 8 of Fibonacci series is: 21')
 
+    def test_mod(self):
         program_mod = '''
         mov   a, 11           ; value1
         mov   b, 3            ; value2
@@ -94,8 +98,8 @@ class Kata2TestCase(unittest.TestCase):
         '''
 
         self.assertEqual(assembler_interpreter(program_mod), 'mod(11, 3) = 2')
-        return
 
+    def test_gcd(self):
         program_gcd = '''
         mov   a, 81         ; value1
         mov   b, 153        ; value2
@@ -146,6 +150,7 @@ class Kata2TestCase(unittest.TestCase):
 
         self.assertEqual(assembler_interpreter(program_gcd), 'gcd(81, 153) = 9')
 
+    def test_fail(self):
         program_fail = '''
         call  func1
         call  print
@@ -164,6 +169,7 @@ class Kata2TestCase(unittest.TestCase):
 
         self.assertEqual(assembler_interpreter(program_fail), -1)
 
+    def test_power(self):
         program_power = '''
         mov   a, 2            ; value1
         mov   b, 10           ; value2
@@ -189,6 +195,9 @@ class Kata2TestCase(unittest.TestCase):
         '''
 
         self.assertEqual(assembler_interpreter(program_power), '2^10 = 1024')
+
+
+class Kata2TestCase(unittest.TestCase):
 
     def test_check_divisible_by_7(self):
         for num in range(0, 101):
